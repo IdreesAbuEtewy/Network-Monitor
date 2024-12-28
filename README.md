@@ -11,13 +11,13 @@ A full stack application developed using MERN stack that checks the up and down 
 Clone the Repositoy:
 
 ```bash
-git clone https://github.com/nishant-nez/Network-Monitoring
+git clone https://github.com/DaBiQ/Network-Monitor
 ```
 
 Go Inside the directory:
 
 ```bash
-cd Network-Monitoring
+cd Network-Monitor
 ```
 
 Build the docker image:
@@ -55,4 +55,4 @@ docker-compose down --rmi all
 
 ## URL
 
-- Site live at [network.deerwalk.edu.np](https://network.deerwalk.edu.np/)
+- Site live at [Not deployed yet]
