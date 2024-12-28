@@ -11,7 +11,7 @@ A full stack application developed using MERN stack that checks the up and down 
 Clone the Repositoy:
 
 ```bash
-git clone https://github.com/DaBiQ/Network-Monitor
+git clone https://github.com/IdreesEtewy/Network-Monitor
 ```
 
 Go Inside the directory:
