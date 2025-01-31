@@ -1,6 +1,6 @@
 import { Card, Typography, Chip } from "@material-tailwind/react";
 
-const TABLE_HEAD = ["Name", "IP", "Type", "Status"];
+const TABLE_HEAD = ["Name", "MAC", "IP", "Type", "Status"];
 
 const DeviceDetailsTable = ({ data, location }) => {
     return (
@@ -32,7 +32,7 @@ const DeviceDetailsTable = ({ data, location }) => {
                         </tr>
                     </thead>
                     <tbody>
-                        { data.map(({ name, ip, type, status }, index) => {
+                        { data.map(({ name, mac, ip, type, status }, index) => {
                             const isLast = index === data.length - 1;
                             const classes = isLast ? "p-4" : "p-4 border-b border-blue-gray-50";
 
@@ -45,6 +45,15 @@ const DeviceDetailsTable = ({ data, location }) => {
                                             className="font-normal"
                                         >
                                             { name }
+                                        </Typography>
+                                    </td>
+                                    <td className={ classes }>
+                                        <Typography
+                                            variant="small"
+                                            color="blue-gray"
+                                            className="font-normal"
+                                        >
+                                            { mac }
                                         </Typography>
                                     </td>
                                     <td className={ classes }>

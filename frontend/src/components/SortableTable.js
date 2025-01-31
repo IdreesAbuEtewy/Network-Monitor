@@ -5,128 +5,111 @@ import { Spinner } from "@material-tailwind/react";
 import DevicesTable from "./DevicesTable";
 
 const TABS = [
-    {
-        label: "All",
-        value: "all",
-    },
-    {
-        label: "Up",
-        value: "up",
-    },
-    {
-        label: "Down",
-        value: "down",
-    },
+  {
+    label: "All",
+    value: "all",
+  },
+  {
+    label: "Up",
+    value: "up",
+  },
+  {
+    label: "Down",
+    value: "down",
+  },
 ];
 
-const TABLE_HEAD = ["Name", "IP", "Type", "Status", "Response Time", "Last Updated", ""];
+const TABLE_HEAD = ["Name", "MAC Address", "IP Address", "Type", "Status", "Response Time", "Last Updated", ""];
 
 const TimeAgo = (date) => {
-    return formatDistanceToNow(new Date(date), { addSuffix: true });
-}
+  return formatDistanceToNow(new Date(date), { addSuffix: true });
+};
+
 const TimeAgoNoSuffix = (date) => {
-    return formatDistanceToNow(new Date(date));
-}
+  return formatDistanceToNow(new Date(date));
+};
 
 function searchObjects(data, searchTerm) {
-    // Convert the searchTerm to lowercase for case-insensitive search
-    const lowerSearchTerm = searchTerm.toLowerCase();
+  if (!searchTerm) return data;
 
-    // Filter the array based on whether the searchTerm is present in any property value
-    const result = data.filter(obj => {
-        for (const key in obj) {
-            if (obj.hasOwnProperty(key) && typeof obj[key] === 'string' && obj[key].toLowerCase().includes(lowerSearchTerm)) {
-                return true;
-            }
-        }
-        return false;
-    });
-
-    return result;
+  const lowerSearchTerm = searchTerm.toLowerCase();
+  return data.filter((obj) => {
+    return Object.values(obj).some((value) =>
+      String(value).toLowerCase().includes(lowerSearchTerm)
+    );
+  });
 }
 
 export default function SortableTable(props) {
-    const [searchTerm, setSearchTerm] = useState('');
-    const [selectedTab, setSelectedTab] = useState('all');
-    const { devices, isPending } = useContext(DeviceContext);
-    // console.log('devices: ' + devices)
-    const [data, setData] = useState(devices);
-    // console.log('data: ' + data)
-    const TABLE_ROWS = [];
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedTab, setSelectedTab] = useState("all");
+  const { devices, isPending } = useContext(DeviceContext);
+  const [data, setData] = useState(devices);
+  const [filteredData, setFilteredData] = useState([]);
 
-    // Use useEffect to update data when the selected tab or devices change
-    useEffect(() => {
-        setData(devices);
-        if (devices) {
-            // Filter data based on the selected tab
-            let filteredData = devices;
+  useEffect(() => {
+    if (devices) {
+      let filteredDevices = devices;
 
-            if (selectedTab === 'all') {
-                // No tab filtering
-            } else if (selectedTab === 'up') {
-                filteredData = devices.filter((device) => device.status === 'up');
-            } else {
-                filteredData = devices.filter((device) => device.status === 'down');
-            }
+      // Filter by tab
+      if (selectedTab === "up") {
+        filteredDevices = devices.filter((device) => device.status === "up");
+      } else if (selectedTab === "down") {
+        filteredDevices = devices.filter((device) => device.status === "down");
+      }
 
-            // Filter based on props.filter if it's not an empty string
-            if (props.filter !== '') {
-                filteredData = filteredData.filter((device) => device.type === props.filter);
-                // Set the filtered data to state
-            }
+      // Filter by type (if provided)
+      if (props.filter) {
+        filteredDevices = filteredDevices.filter(
+          (device) => device.type === props.filter
+        );
+      }
 
-            setData(filteredData);
-            console.log('devices: ', devices)
-            // console.log('CURRENT DATA : ', )
-        }
-    }, [selectedTab, devices, props.filter]);
+      // Filter by search term
+      if (searchTerm) {
+        filteredDevices = searchObjects(filteredDevices, searchTerm);
+      }
 
-    if (data && data.title !== 'Unauthorized') {
-        data.map((item) => {
-            TABLE_ROWS.push({
-                id: item._id,
-                name: item.name,
-                location: item.location,
-                ip: item.ip,
-                type: item.type,
-                status: item.status,
-                responseTime: item.responseTime === '-1' ? 'n/a' : item.responseTime + 'ms',
-                lastUpdated: item.status === 'down' ? '(Down since) ' + TimeAgoNoSuffix(item.updatedAt) : TimeAgo(item.updatedAt),
-            });
-            return item;
-        });
-
-        TABLE_ROWS.sort((a, b) => {
-            if (a.status === 'down' && b.status !== 'down') {
-                return -1; // 'down' comes before other statuses
-            } else if (a.status !== 'down' && b.status === 'down') {
-                return 1; // Other statuses come after 'down'
-            } else {
-                return 0; // Maintain the order for other statuses
-            }
-        });
+      setFilteredData(filteredDevices);
     }
+  }, [devices, selectedTab, props.filter, searchTerm]);
 
-    const handleTabChange = (value) => {
-        setSelectedTab(value);
-    };
+  const handleTabChange = (value) => {
+    setSelectedTab(value);
+  };
 
-    return (
-        <>
-            { isPending && <Spinner /> }
-            { data &&
-                <DevicesTable
-                    selectedTab={ selectedTab }
-                    handleTabChange={ handleTabChange }
-                    data={ data }
-                    TABLE_HEAD={ TABLE_HEAD }
-                    TABLE_ROWS={ TABLE_ROWS }
-                    TABS={ TABS }
-                    searchObjects={ searchObjects }
-                    searchTerm={ searchTerm }
-                    setSearchTerm={ setSearchTerm }
-                />
-            }
-        </>
-    );
+  const TABLE_ROWS = filteredData.map((item) => ({
+    id: item._id,
+    name: item.name,
+    mac: item.mac,
+    location: item.location,
+    ip: item.ip,
+    type: item.type,
+    status: item.status,
+    responseTime: item.responseTime === "-1" ? "n/a" : item.responseTime + "ms",
+    lastUpdated:
+      item.status === "down"
+        ? "(Down since) " + TimeAgoNoSuffix(item.updatedAt)
+        : TimeAgo(item.updatedAt),
+  }));
+
+  return (
+    <>
+      {isPending && <Spinner />}
+      {data && (
+        <DevicesTable
+          selectedTab={selectedTab}
+          handleTabChange={handleTabChange}
+          data={filteredData}
+          TABLE_HEAD={TABLE_HEAD}
+          TABLE_ROWS={TABLE_ROWS}
+          TABS={TABS}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          totalDevices={devices.length}
+          filteredDevices={filteredData.length}
+        />
+      )}
+    </>
+  );
 }

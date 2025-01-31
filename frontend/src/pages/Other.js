@@ -23,7 +23,7 @@ const AP = () => {
                 <>
                     <ComplexNavbar />
                     <div className="main-table mx-14 my-10">
-                        <SortableTable filter={ 'Others' } />
+                        <SortableTable filter={ 'Other' } />
                     </div>
                 </>
             }

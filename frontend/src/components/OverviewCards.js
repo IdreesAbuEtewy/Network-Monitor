@@ -1,18 +1,64 @@
 import { DeviceContext } from '../contexts/DeviceContext';
+import { AuthContext } from "../contexts/AuthContext";
+import { Toast, ToastBox } from "../components/Toast";
 import { useContext, useEffect, useState } from 'react';
 import {
     Card,
     Typography,
 } from "@material-tailwind/react";
 import { useNavigate } from 'react-router-dom';
+import { backend } from '../constants';
+import {
+    Button,
+    Spinner,
+} from "@material-tailwind/react";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
 
 const OverviewCards = () => {
     const { devices: data } = useContext(DeviceContext);
+    const { isLoggedin, toggleLogout } = useContext(AuthContext);
+    const {  updateDevices } = useContext(DeviceContext);
     const [upCount, setUpCount] = useState(0);
     const [downCount, setDownCount] = useState(0);
     const [unknownCount, setUnknownCount] = useState(0);
     const [cards, setCards] = useState([]);
     const navigate = useNavigate();
+    const [isScanning, setIsScanning] = useState(false);
+    const [token, setToken] = useState(() => {
+        const storedToken = localStorage.getItem('user');
+        return storedToken ? JSON.parse(storedToken) : null;
+    });
+
+const handleScanNetwork = async () => {
+        setIsScanning(true); // Start loading
+        try {
+          const response = await fetch(backend + "/api/devices/scan", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          });
+      
+          if (response.status === 401) {
+            toggleLogout();
+            throw new Error("Unauthorized");
+          }
+      
+          if (!response.ok) {
+            throw new Error("Network scan failed");
+          }
+      
+          const result = await response.json();
+          Toast("success", "Network scan completed!");
+          updateDevices(); // Refresh the device list
+        } catch (error) {
+          Toast("error", error.message);
+        } finally {
+          setIsScanning(false); // Stop loading
+        }
+      };
+
 
     useEffect(() => {
         if (data && Array.isArray(data)) {
@@ -51,6 +97,21 @@ const OverviewCards = () => {
 
     return (
         <div className="mx-14 bg-white rounded-lg shadow-lg p-10 mb-6">
+             <Button
+            className="flex items-center gap-3 text-sm rounded-full" 
+            size="lg"
+            onClick={handleScanNetwork}
+            disabled={isScanning} // Disable button during scan
+            >
+            {isScanning ? (
+                <Spinner className="h-6 w-6" />
+            ) : (
+                <>
+                <MagnifyingGlassIcon strokeWidth={4} className="h-6 w-6" /> Scan Network
+                </>
+            )}
+            </Button>
+
             <div className="mx-auto grid">
                 <h2 className="text-2xl font-bold text-gray-800 pb-6 text-center">
                     Overview

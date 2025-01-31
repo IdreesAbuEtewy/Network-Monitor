@@ -14,6 +14,7 @@ import { PencilIcon } from "@heroicons/react/24/solid";
 import DeviceDetailsCharts from "../components/DeviceDetailsCharts";
 import DeviceDetailsCard from "../components/DeviceDetailsCard";
 import DeviceDetailsNotifications from "../components/DeviceDetailsNotifications";
+import { DeviceContext } from '../contexts/DeviceContext';
 
 
 const DeviceDetails = () => {
@@ -26,6 +27,7 @@ const DeviceDetails = () => {
     const [dailyResponse, setDailyResponse] = useState([]);
     const [notifications, setNotifications] = useState([]);
     const [downs, setDowns] = useState(0);
+    const { updateDevices } = useContext(DeviceContext); 
 
     // FORM
     const [isClicked, setIsClicked] = useState(false);
@@ -146,6 +148,7 @@ const DeviceDetails = () => {
             Toast('success', 'Device Deleted!');
             console.log("-------------navigate to / called by devicedetails line 153");
             console.log('isLoggedin: ', isLoggedin);
+            updateDevices();
             navigate('/');
             setIsClicked(!isClicked);
         }).catch(err => {
@@ -182,6 +185,7 @@ const DeviceDetails = () => {
         }).then((data) => {
             handleOpen();
             Toast('success', 'Device Updated!')
+             updateDevices();
             setIsClicked(!isClicked);
         }).catch(err => {
             handleOpen();

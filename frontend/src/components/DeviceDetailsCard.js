@@ -25,6 +25,7 @@ const DeviceDetailsCard = ({ data }) => {
 
                     <div className="flex items-center justify-between">
                         <Typography variant="paragraph">
+                            Mac-address: <br />
                             IP: <br />
                             Location <br />
                             Current Status: <br />
@@ -33,6 +34,7 @@ const DeviceDetailsCard = ({ data }) => {
                             Last Updated: <br />
                         </Typography>
                         <Typography variant="paragraph" className="">
+                            { data.mac } <br />
                             { data.ip } <br />
                             { data.location } <br />
                             { data.status === 'up'

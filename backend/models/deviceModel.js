@@ -29,11 +29,22 @@ const deviceSchema = mongoose.Schema(
             enum: ['up', 'down', 'unknown'],
             default: 'unknown',
         },
+        mac: {
+            type: String,
+            unique: true,
+        },
+        sshUsername: {
+            type: String,
+            default: "admin",
+        },
+        sshPassword: {
+            type: String,
+            default: "admin", 
+        },
     },
     {
         timestamps: true,
     }
 );
-
 
 module.exports = mongoose.model("Device", deviceSchema);

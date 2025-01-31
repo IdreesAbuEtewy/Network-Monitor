@@ -5,6 +5,8 @@ import { DeviceContext } from '../contexts/DeviceContext';
 import ComplexNavbar from '../components/ComplexNavbar';
 import SortableTable from '../components/SortableTable';
 import AddDeviceForm from '../components/AddDeviceForm';
+import ControlDeviceForm from "../components/ControlDeviceForm";
+
 import { backend } from '../constants';
 import {
     Button,
@@ -13,7 +15,7 @@ import {
     DialogFooter,
     Spinner,
 } from "@material-tailwind/react";
-import { PlusIcon } from "@heroicons/react/24/solid";
+import { PlusIcon , PowerIcon } from "@heroicons/react/24/solid";
 import { Toast, ToastBox } from "../components/Toast";
 import OverviewCards from '../components/OverviewCards';
 
@@ -27,8 +29,12 @@ const Home = () => {
     // const [data, setData] = useState(null);
     // const { data, isPending, error } = useFetch('/api/devices');
     const [open, setOpen] = React.useState(false);
+    const [openControlDevice, setOpenControlDevice] = useState(false);
 
     const [isClicked, setIsClicked] = useState(false);
+    const [isScanning, setIsScanning] = useState(false);
+
+    const handleOpenControlDevice = () => setOpenControlDevice(!openControlDevice);
 
     const handleOpen = () => setOpen(!open);
 
@@ -46,6 +52,9 @@ const Home = () => {
     //         updateDevices(data);
     //     }
     // }, [data, updateDevices]);
+
+   
+      
 
     // FORM
     const [addPending, setAddPending] = useState(false);
@@ -125,10 +134,14 @@ const Home = () => {
                     { devices && <>
                         {/* { devices.length === 0 && navigate('/') } */ }
                         <div className="mb-8 flex items-center justify-between gap-8">
-                            <div className="flex shrink-0 flex-col gap-2 sm:flex-row fixed right-10 bottom-10 z-10">
+                                <div className="flex shrink-0 flex-col gap-2 sm:flex-row fixed right-10 bottom-10 z-10">
                                 <Button className="flex items-center gap-3 text-lg" size="lg" onClick={ handleOpen }>
                                     <PlusIcon strokeWidth={ 4 } className="h-6 w-6" /> Add Device
                                 </Button>
+                                <Button className="flex items-center gap-3 text-lg" size="lg" onClick={handleOpenControlDevice}>
+                                        <PowerIcon strokeWidth={4} className="h-6 w-6" /> Control Device
+                                    </Button>
+
                             </div>
                         </div>
 
@@ -170,6 +183,19 @@ const Home = () => {
                                 </Button>
                             </DialogFooter>
                         </Dialog>
+
+                        {/* Control Device Dialog */}
+                        <Dialog open={openControlDevice} handler={handleOpenControlDevice}>
+                                <DialogHeader>Control Device</DialogHeader>
+                                <ControlDeviceForm handleClose={handleOpenControlDevice} />
+                                <DialogFooter>
+                                    <Button variant="text" color="red" onClick={handleOpenControlDevice} className="mr-1">
+                                        <span>Cancel</span>
+                                    </Button>
+                                </DialogFooter>
+                            </Dialog>
+
+                            
                     </> }
 
                     <ToastBox />
